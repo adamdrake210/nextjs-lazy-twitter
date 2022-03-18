@@ -14,9 +14,11 @@
     "@emotion/styled": "^11.8.1",
     "@mui/icons-material": "^5.5.1",
     "@mui/material": "^5.5.1",
+    "axios": "^0.26.1",
     "next": "12.1.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "react-hook-form": "^7.28.0",
     "react-query": "^3.34.16"
   },
   "devDependencies": {
