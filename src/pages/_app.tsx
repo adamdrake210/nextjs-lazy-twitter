@@ -49,15 +49,15 @@ const App = ({
   }, [prefersDarkMode]);
 
   return (
-      <QueryClientProvider client={queryClient}>
-        <CacheProvider value={emotionCache}>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Component {...pageProps} />
-          </ThemeProvider>
-        </CacheProvider>
-        <ReactQueryDevtools />
-      </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <CacheProvider value={emotionCache}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </CacheProvider>
+      <ReactQueryDevtools />
+    </QueryClientProvider>
   );
 };
 
