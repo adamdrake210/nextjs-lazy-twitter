@@ -16,7 +16,7 @@ export const TweetTopicsList = () => {
         <>
           <Typography>Tweet Topics</Typography>
           <ul>
-            {data[0].tweettopics.map((topic) => {
+            {data[0].tweettopics.map((topic: string) => {
               return <li key={topic}>{topic}</li>;
             })}
           </ul>

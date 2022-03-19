@@ -48,7 +48,7 @@ const LoginForm = () => {
     onError: (err: Error) => {
       console.error(err.message);
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       queryClient.refetchQueries();
       localStorage.setItem(ACCESS_TOKEN, data.access_token);
       router.push(HOME);

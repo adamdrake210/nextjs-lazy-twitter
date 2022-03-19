@@ -18,5 +18,5 @@ export const axiosCall = async (requestBody: any) => {
       ...requestBody,
     })
   );
-  return response.data;
+  return response?.data;
 };
