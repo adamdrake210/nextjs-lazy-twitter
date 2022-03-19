@@ -11,13 +11,11 @@ export const UserProfileDetails = () => {
     () => getUserProfile()
   );
 
-  console.log("data: ", data);
-
   return (
     <Loading isLoading={isLoading} isError={isError} error={error}>
-      {data?.results && data?.results?.length > 0 ? (
+      {data ? (
         <>
-          <Typography>Wow it works</Typography>
+          <Typography>Welcome {data.email}</Typography>
         </>
       ) : (
         <Box sx={{ mt: 2 }}>

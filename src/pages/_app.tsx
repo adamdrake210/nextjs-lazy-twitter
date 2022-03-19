@@ -14,7 +14,6 @@ import { EmotionCache } from "@emotion/cache";
 
 import getDesignTokens from "styles/theme";
 import createEmotionCache from "@/styles/createEmotionCache";
-import { SessionProvider } from "next-auth/react";
 
 const queryClient = new QueryClient();
 const clientSideEmotionCache = createEmotionCache();
@@ -50,17 +49,15 @@ const App = ({
   }, [prefersDarkMode]);
 
   return (
-    <SessionProvider session={pageProps.session}>
-      <QueryClientProvider client={queryClient}>
-        <CacheProvider value={emotionCache}>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Component {...pageProps} />
-          </ThemeProvider>
-        </CacheProvider>
-        <ReactQueryDevtools />
-      </QueryClientProvider>
-    </SessionProvider>
+    <QueryClientProvider client={queryClient}>
+      <CacheProvider value={emotionCache}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </CacheProvider>
+      <ReactQueryDevtools />
+    </QueryClientProvider>
   );
 };
 

@@ -14,7 +14,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Link from "next/link";
 
 import { HOME, DASHBOARD, USER_PROFILE } from "@/constants/routerConstants";
-import { COMPANY_NAME } from "@/constants/constants";
+import { ACCESS_TOKEN, COMPANY_NAME } from "@/constants/constants";
 import { Loading } from "../Loading";
 
 const menuItems = [
@@ -64,7 +64,7 @@ const Navigation: React.FC = () => {
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {
-      setAccesstoken(localStorage.getItem("token"));
+      setAccesstoken(localStorage.getItem(ACCESS_TOKEN));
     }
   }, []);
 
