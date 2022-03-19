@@ -11,7 +11,6 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 
 import { HOME, DASHBOARD, USER_PROFILE } from "@/constants/routerConstants";
@@ -35,14 +34,14 @@ const avatorDropDownMenu = [
 ];
 
 const Navigation: React.FC = () => {
-  const { data: session, status } = useSession();
-
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
+
+  const [accessToken, setAccesstoken] = React.useState<string | undefined>("");
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -59,12 +58,14 @@ const Navigation: React.FC = () => {
     setAnchorElUser(null);
   };
 
-  const handleSignIn = () => {
-    signIn();
-  };
+  // const handleSignOut = React.useCallback(() => {
+  //   signOut();
+  // }, []);
 
-  const handleSignOut = React.useCallback(() => {
-    signOut();
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      setAccesstoken(localStorage.getItem("token"));
+    }
   }, []);
 
   return (
@@ -87,7 +88,7 @@ const Navigation: React.FC = () => {
               {COMPANY_NAME}
             </Typography>
           </Link>
-          {session?.user && (
+          {accessToken && (
             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
               <IconButton
                 size="large"
@@ -144,7 +145,7 @@ const Navigation: React.FC = () => {
               cursor: "pointer",
             }}
           >
-            {session?.user && (
+            {accessToken && (
               <>
                 {menuItems.map((item) => (
                   <Link href={item.url} passHref key={item.label}>
@@ -162,20 +163,16 @@ const Navigation: React.FC = () => {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            {status === "loading" ? (
-              <Loading />
-            ) : session?.user ? (
+            {accessToken ? (
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt={session.user.name} src={session.user.image} />
+                  <Avatar src="https://pbs.twimg.com/profile_images/846643773107048448/l3zndenR_normal.jpg" />
                 </IconButton>
               </Tooltip>
             ) : (
               <>
-                <Button onClick={handleSignIn}>Login</Button>
-                <Button variant="contained" onClick={handleSignIn}>
-                  Sign Up
-                </Button>
+                <Button>Login</Button>
+                <Button variant="contained">Sign Up</Button>
               </>
             )}
 
@@ -205,9 +202,7 @@ const Navigation: React.FC = () => {
                 </MenuItem>
               ))}
               <MenuItem>
-                <Button variant="contained" onClick={handleSignOut}>
-                  Logout
-                </Button>
+                <Button variant="contained">Logout</Button>
               </MenuItem>
             </Menu>
           </Box>
