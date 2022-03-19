@@ -1,33 +1,27 @@
-import React from "react";
-import { getSession } from "next-auth/react";
-import { GetServerSideProps } from "next";
+import React, { useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 
 import { HOME } from "@/constants/routerConstants";
 
-import { COMPANY_NAME } from "@/constants/constants";
+import { ACCESS_TOKEN, COMPANY_NAME } from "@/constants/constants";
 import { green } from "@mui/material/colors";
 import { Layout } from "@/layout/Layout";
 import LoginForm from "@/components/login/LoginForm";
-
-// export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-// const session = await getSession({ req });
-// if (!session) {
-//   res.statusCode = 403;
-//   return { props: {} };
-// }
-
-// return {
-//   redirect: {
-//     destination: HOME,
-//     permanent: false,
-//   },
-// };
-// };
+import { useRouter } from "next/router";
 
 export default function Login() {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (localStorage[ACCESS_TOKEN]) {
+      router.push(HOME);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <Layout title="Lazy Twitter">
+    <Layout title="Login">
       <Box
         sx={{
           display: "flex",
