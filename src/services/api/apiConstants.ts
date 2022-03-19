@@ -17,4 +17,11 @@ export const API_ENDPOINTS = {
     method: "get",
     url: "user",
   },
+
+  // TweetInfo
+
+  API_GET_ALL_TWEET_INFO: {
+    method: "get",
+    url: "tweetinfo",
+  },
 };

@@ -9,6 +9,7 @@ import ControlledTextField from "@/components/common/ControlledTextField";
 import ControlledPasswordField from "@/components/common/ControlledPasswordField";
 import { Loading } from "../Loading";
 import { HOME } from "@/constants/routerConstants";
+import { ACCESS_TOKEN } from "@/constants/constants";
 
 const useStyles = makeStyles<Theme>((theme) => ({
   formContainer: {
@@ -48,9 +49,8 @@ const LoginForm = () => {
       console.error(err.message);
     },
     onSuccess: (data) => {
-      console.log("data: ", data);
       queryClient.refetchQueries();
-      localStorage.setItem("token", data.data.access_token);
+      localStorage.setItem(ACCESS_TOKEN, data.access_token);
       router.push(HOME);
     },
     // Always refetch after error or success:

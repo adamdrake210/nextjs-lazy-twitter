@@ -4,6 +4,7 @@ import { Grid, Typography } from "@mui/material";
 
 import { Layout } from "@/layout/Layout";
 import { UserProfileDetails } from "@/components/profile/UserProfileDetails";
+import { TweetTopicsList } from "@/components/tweetInfo/TweetTopicsList";
 
 export default function UserDashboard() {
   return (
@@ -16,7 +17,7 @@ export default function UserDashboard() {
           <UserProfileDetails />
         </Grid>
         <Grid item xs={12} sm={4}>
-          <Typography>This is a secret dashboard!</Typography>
+          <TweetTopicsList />
         </Grid>
       </Grid>
     </Layout>

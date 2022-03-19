@@ -12,8 +12,14 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
-import { HOME, DASHBOARD, USER_PROFILE } from "@/constants/routerConstants";
+import {
+  HOME,
+  DASHBOARD,
+  USER_PROFILE,
+  LOGIN,
+} from "@/constants/routerConstants";
 import { ACCESS_TOKEN, COMPANY_NAME } from "@/constants/constants";
 import { Loading } from "../Loading";
 
@@ -34,13 +40,13 @@ const avatorDropDownMenu = [
 ];
 
 const Navigation: React.FC = () => {
+  const router = useRouter();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
-
   const [accessToken, setAccesstoken] = React.useState<string | undefined>("");
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -58,13 +64,15 @@ const Navigation: React.FC = () => {
     setAnchorElUser(null);
   };
 
-  // const handleSignOut = React.useCallback(() => {
-  //   signOut();
-  // }, []);
+  const handleSignOut = () => {
+    setAccesstoken("");
+    localStorage.removeItem(ACCESS_TOKEN);
+    router.push(LOGIN);
+  };
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {
-      setAccesstoken(localStorage.getItem(ACCESS_TOKEN));
+      setAccesstoken(localStorage[ACCESS_TOKEN]);
     }
   }, []);
 
@@ -202,7 +210,9 @@ const Navigation: React.FC = () => {
                 </MenuItem>
               ))}
               <MenuItem>
-                <Button variant="contained">Logout</Button>
+                <Button variant="contained" onClick={handleSignOut}>
+                  Logout
+                </Button>
               </MenuItem>
             </Menu>
           </Box>
