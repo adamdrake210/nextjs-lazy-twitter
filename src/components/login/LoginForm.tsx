@@ -5,8 +5,8 @@ import { useMutation, useQueryClient } from "react-query";
 import { useRouter } from "next/router";
 
 import { createToken } from "@/services/api/authApi";
-import ControlledTextField from "@/components/common/ControlledTextField";
-import ControlledPasswordField from "@/components/common/ControlledPasswordField";
+import ControlledTextField from "@/components/common/fields/ControlledTextField";
+import ControlledPasswordField from "@/components/common/fields/ControlledPasswordField";
 import { Loading } from "../Loading";
 import { HOME } from "@/constants/routerConstants";
 import { ACCESS_TOKEN } from "@/constants/constants";
