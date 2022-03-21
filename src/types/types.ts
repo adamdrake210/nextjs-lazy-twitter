@@ -1,4 +1,5 @@
 export type TweetInfo = {
+  id?: number;
   tweettopics: string[];
   tweetquestions: string[];
 };

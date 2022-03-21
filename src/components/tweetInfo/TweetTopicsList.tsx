@@ -1,17 +1,30 @@
-import { getAllTweetInfo } from "@/services/api/tweetInfoApi";
-import { TweetInfo } from "@/types/types";
-import { Box, List, ListItem, ListItemText, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import React from "react";
 import { useQuery } from "react-query";
+
+import { useOpen } from "@/hooks/useOpen";
+import { getAllTweetInfo } from "@/services/api/tweetInfoApi";
+import { TweetInfo } from "@/types/types";
+
 import { Loading } from "../Loading";
+import ModalContainer from "../common/modal/ModalContainer";
+import { TweetTopicsForm } from "./TweetTopicsForm";
+import { RQ_KEY_TWEETINFO } from "@/constants/constants";
 
 export const TweetTopicsList = () => {
+  const { open, handleClose, handleOpen } = useOpen();
+
   const { data, isLoading, isError, error } = useQuery<TweetInfo[], Error>(
-    ["tweetinfo"],
+    [RQ_KEY_TWEETINFO],
     () => getAllTweetInfo()
   );
-
-  console.log("data: ", data);
 
   return (
     <Loading isLoading={isLoading} isError={isError} error={error}>
@@ -37,6 +50,18 @@ export const TweetTopicsList = () => {
           </Typography>
         </Box>
       )}
+      <Box>
+        <Button color="primary" variant="contained" onClick={handleOpen}>
+          Edit Topics
+        </Button>
+      </Box>
+      <ModalContainer handleClose={handleClose} open={open}>
+        <TweetTopicsForm
+          handleClose={handleClose}
+          tweetInfo={data && data[0]}
+          isEditing={data && data[0].tweettopics.length > 0}
+        />
+      </ModalContainer>
     </Loading>
   );
 };

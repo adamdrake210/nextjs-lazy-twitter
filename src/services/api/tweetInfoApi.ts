@@ -17,6 +17,7 @@ export function getAllTweetInfo() {
 }
 
 export function createTweetInfo(createTweetInfoParams: TweetInfo) {
+  console.log("createTweetInfoParams: ", createTweetInfoParams);
   return axiosCall({
     method: API_CREATE_TWEET_INFO.method,
     url: API_CREATE_TWEET_INFO.url,
@@ -27,16 +28,16 @@ export function createTweetInfo(createTweetInfoParams: TweetInfo) {
   });
 }
 
-export function updateTweetInfo(
-  updateTweetInfoParams: Partial<TweetInfo>,
-  id: string
-) {
+export function updateTweetInfo(updateTweetInfoParams: Partial<TweetInfo>) {
+  const { id, tweettopics } = updateTweetInfoParams;
   return axiosCall({
     method: API_UPDATE_TWEET_INFO.method,
     url: `${API_UPDATE_TWEET_INFO.url}/${id}`,
     headers: {
       Authorization: `Bearer ${localStorage[ACCESS_TOKEN]}`,
     },
-    data: updateTweetInfoParams,
+    data: {
+      tweettopics,
+    },
   });
 }
