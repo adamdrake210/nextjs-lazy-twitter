@@ -17,7 +17,6 @@ export function getAllTweetInfo() {
 }
 
 export function createTweetInfo(createTweetInfoParams: TweetInfo) {
-  console.log("createTweetInfoParams: ", createTweetInfoParams);
   return axiosCall({
     method: API_CREATE_TWEET_INFO.method,
     url: API_CREATE_TWEET_INFO.url,
