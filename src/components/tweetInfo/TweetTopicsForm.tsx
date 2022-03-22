@@ -1,14 +1,16 @@
-import React, { useState } from "react";
-import { Button, IconButton, Theme, Typography } from "@mui/material";
-import makeStyles from "@mui/styles/makeStyles";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
+import { Box, Button, IconButton, Theme, Typography } from "@mui/material";
+import makeStyles from "@mui/styles/makeStyles";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
+
 import { RQ_KEY_TWEETINFO } from "@/constants/constants";
 import { useForm } from "react-hook-form";
 import { TweetInfo } from "@/types/types";
 import { updateTweetInfo } from "@/services/api/tweetInfoApi";
 import { Loading } from "../Loading";
-import ControlledTextField from "../common/fields/ControlledTextField";
-import { HdrPlus } from "@mui/icons-material";
+import ControlledTextField from "@/components/common/fields/ControlledTextField";
 
 const useStyles = makeStyles<Theme>((theme) => ({
   formContainer: {
@@ -21,7 +23,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
   buttonsContainer: {
     display: "flex",
     justifyContent: "space-between",
-    width: "100%",
+    width: "70%",
     margin: theme.spacing(2, 0),
   },
 }));
@@ -29,27 +31,24 @@ const useStyles = makeStyles<Theme>((theme) => ({
 type TweetTopicsFormProps = {
   handleClose: () => void;
   tweetInfo?: TweetInfo;
-  isEditing?: boolean;
 };
 
-const getDefaultValues = (tweetInfo: TweetInfo) => {
-  const obj = tweetInfo.tweettopics.reduce(
-    (acc, cur) => ({ ...acc, [cur]: cur }),
-    {}
-  );
+const getDefaultValues = (tweettopics: TweetInfo["tweettopics"]) => {
+  const obj = tweettopics.reduce((acc, cur) => ({ ...acc, [cur]: cur }), {});
   return obj;
 };
 
 export const TweetTopicsForm = ({
   handleClose,
   tweetInfo,
-  isEditing,
 }: TweetTopicsFormProps) => {
   const classes = useStyles();
   const queryClient = useQueryClient();
+  const [tweetTopics, setTweetTopics] = useState<string[]>([]);
   const [inputFieldCount, setInputFieldCount] = useState(["0"]);
-  const { handleSubmit, control } = useForm<any>({
-    defaultValues: tweetInfo ? getDefaultValues(tweetInfo) : null,
+
+  const { handleSubmit, control, unregister } = useForm<any>({
+    defaultValues: tweetInfo ? getDefaultValues(tweetInfo.tweettopics) : null,
   });
 
   const mutationOptions = {
@@ -71,25 +70,45 @@ export const TweetTopicsForm = ({
     mutationOptions
   );
 
-  const onSubmit = (formData: { god: string }) => {
-    console.log("formData: ", formData);
-
+  const onSubmit = (formData: { [key: string]: string }) => {
     editMutation.mutate({
       id: tweetInfo?.id,
       tweettopics: Object.values(formData).filter((el) => el),
     });
   };
 
+  const handleRemoveItem = (topic: string) => {
+    const updatedTopics = tweetTopics.filter((tt) => {
+      return tt !== topic;
+    });
+    setTweetTopics(updatedTopics);
+    unregister(topic);
+  };
+
+  useEffect(() => {
+    if (tweetInfo) {
+      setTweetTopics(tweetInfo.tweettopics);
+    }
+  }, []);
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={classes.formContainer}>
-      <Typography variant="h4">Tweet Topics</Typography>
+      <Typography variant="h4" gutterBottom>
+        Tweet Topics
+      </Typography>
 
-      {isEditing &&
-        tweetInfo &&
-        tweetInfo.tweettopics.map((topic, index) => {
-          return (
+      {tweetTopics.map((topic, index) => {
+        return (
+          <Box
+            key={`${topic + index}`}
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <ControlledTextField
-              key={`${topic + index}`}
               control={control}
               name={topic}
               label={`Topic #${index + 1}`}
@@ -100,48 +119,71 @@ export const TweetTopicsForm = ({
                 },
               }}
             />
-          );
-        })}
-
-      {inputFieldCount.map((count, index) => {
-        return (
-          <ControlledTextField
-            key={`count${index}`}
-            control={control}
-            name={`tweettopic${index}`}
-            label="Add Topic"
-            rules={{
-              maxLength: {
-                value: 24,
-                message: "String can be maximum 24 characters",
-              },
-            }}
-          />
+            <IconButton color="error" onClick={() => handleRemoveItem(topic)}>
+              <RemoveCircleOutlineOutlinedIcon />
+            </IconButton>
+          </Box>
         );
       })}
 
-      <IconButton
-        color="primary"
-        onClick={() => setInputFieldCount([...inputFieldCount, "some"])}
-      >
-        <HdrPlus />
-      </IconButton>
+      {inputFieldCount.map((count, index) => {
+        return (
+          <Box
+            key={`topic${index}`}
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ControlledTextField
+              control={control}
+              name={`tweettopic${index}`}
+              label="Add Topic"
+              rules={{
+                maxLength: {
+                  value: 24,
+                  message: "String can be maximum 24 characters",
+                },
+              }}
+            />
+            <IconButton
+              color="primary"
+              onClick={() => setInputFieldCount([...inputFieldCount, "some"])}
+            >
+              <AddCircleOutlineIcon />
+            </IconButton>
+          </Box>
+        );
+      })}
 
       {editMutation.isLoading && (
         <Loading
           isLoading={editMutation.isLoading}
-          loadingMessage="Updating Team..."
+          loadingMessage="Updating Topics..."
           isError={editMutation.isError}
           error={editMutation.error}
         />
       )}
 
       <div className={classes.buttonsContainer}>
-        <Button type="submit" variant="contained" color="primary">
-          Add Tweet Topics
-        </Button>
-        <Button onClick={handleClose} type="button" variant="outlined">
+        <Button
+          onClick={handleClose}
+          type="button"
+          variant="outlined"
+          color="secondary"
+          disabled={editMutation.isLoading}
+        >
           Cancel
+        </Button>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={editMutation.isLoading}
+        >
+          Save Tweet Topics
         </Button>
       </div>
     </form>

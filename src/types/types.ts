@@ -9,3 +9,7 @@ export type User = {
   email: string;
   twitterhandle: string;
 };
+
+export interface UserWithTweetInfo extends User {
+  tweetinfo: TweetInfo;
+}

@@ -1,29 +1,27 @@
 import React from "react";
-import { useQuery } from "react-query";
-
-import { getUserProfile } from "@/services/api/userApi";
-import { Loading } from "../Loading";
 import { Box, Typography } from "@mui/material";
+
 import { User } from "@/types/types";
 
-export const UserProfileDetails = () => {
-  const { data, isLoading, isError, error } = useQuery<User, Error>(
-    ["profile"],
-    () => getUserProfile()
-  );
+type UserProfileDetailsProps = {
+  userData: User | null;
+};
 
+export const UserProfileDetails = ({ userData }: UserProfileDetailsProps) => {
   return (
-    <Loading isLoading={isLoading} isError={isError} error={error}>
-      {data ? (
+    <>
+      {userData ? (
         <>
-          <Typography>Welcome {data.email}</Typography>
-          <Typography>{data.twitterhandle}</Typography>
+          <Typography>Welcome {userData.email}</Typography>
+          <Typography>{userData.twitterhandle}</Typography>
         </>
       ) : (
         <Box sx={{ mt: 2 }}>
-          <Typography component="p">Some shit went wrong </Typography>
+          <Typography component="p" color="error">
+            No user information found. Please try again.
+          </Typography>
         </Box>
       )}
-    </Loading>
+    </>
   );
 };

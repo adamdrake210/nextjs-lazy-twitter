@@ -27,7 +27,7 @@ export default function ControlledTextField({
       defaultValue=""
       render={({ field, fieldState: { error } }) => (
         <TextField
-          sx={{ my: 2, minWidth: 250 }}
+          sx={{ my: 1, minWidth: 250 }}
           label={label}
           variant="outlined"
           fullWidth
