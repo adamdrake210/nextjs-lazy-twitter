@@ -15,13 +15,21 @@ export const API_ENDPOINTS = {
   },
   API_GET_ONE_USER: {
     method: "get",
-    url: "user",
+    url: "users",
   },
 
   // TweetInfo
 
   API_GET_ALL_TWEET_INFO: {
     method: "get",
+    url: "tweetinfo",
+  },
+  API_CREATE_TWEET_INFO: {
+    method: "post",
+    url: "tweetinfo",
+  },
+  API_UPDATE_TWEET_INFO: {
+    method: "patch",
     url: "tweetinfo",
   },
 };

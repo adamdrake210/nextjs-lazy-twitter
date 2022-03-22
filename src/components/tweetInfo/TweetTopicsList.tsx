@@ -1,31 +1,70 @@
-import { getAllTweetInfo } from "@/services/api/tweetInfoApi";
-import { Box, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import React from "react";
 import { useQuery } from "react-query";
-import { Loading } from "../Loading";
 
-export const TweetTopicsList = () => {
-  const { data, isLoading, isError, error } = useQuery<any, Error>(
-    ["tweetinfo"],
-    () => getAllTweetInfo()
-  );
+import { useOpen } from "@/hooks/useOpen";
+import { TweetInfo, UserWithTweetInfo } from "@/types/types";
+
+import { Loading } from "../Loading";
+import ModalContainer from "../common/modal/ModalContainer";
+import { TweetTopicsForm } from "./TweetTopicsForm";
+import { RQ_KEY_TWEETINFO } from "@/constants/constants";
+import { getOneUser } from "@/services/api/userApi";
+
+type TweetTopicsListProps = {
+  userId: number | undefined;
+};
+
+export const TweetTopicsList = ({ userId }: TweetTopicsListProps) => {
+  const { open, handleClose, handleOpen } = useOpen();
+
+  const { data, isLoading, isError, error } = useQuery<
+    UserWithTweetInfo,
+    Error
+  >([RQ_KEY_TWEETINFO], () => getOneUser(userId || 0));
 
   return (
     <Loading isLoading={isLoading} isError={isError} error={error}>
-      {data && data[0].tweettopics.length > 0 ? (
+      <Typography variant="h4" component="h2">
+        Tweet Topics
+      </Typography>
+      {data && data.tweetinfo.tweettopics.length > 0 ? (
         <>
-          <Typography>Tweet Topics</Typography>
-          <ul>
-            {data[0].tweettopics.map((topic: string) => {
-              return <li key={topic}>{topic}</li>;
+          <List dense>
+            {data.tweetinfo.tweettopics.map((topic: string) => {
+              return (
+                <ListItem key={topic}>
+                  <ListItemText primary={topic} />
+                </ListItem>
+              );
             })}
-          </ul>
+          </List>
         </>
       ) : (
         <Box sx={{ mt: 2 }}>
-          <Typography component="p">Some shit went wrong </Typography>
+          <Typography component="p">
+            You currently don&apos;t have any Tweet Topics
+          </Typography>
         </Box>
       )}
+      <Box>
+        <Button color="primary" variant="contained" onClick={handleOpen}>
+          Edit Topics
+        </Button>
+      </Box>
+      <ModalContainer handleClose={handleClose} open={open}>
+        <TweetTopicsForm
+          handleClose={handleClose}
+          tweetInfo={data && data.tweetinfo}
+        />
+      </ModalContainer>
     </Loading>
   );
 };
