@@ -7,38 +7,31 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import { useQuery } from "react-query";
 
 import { useOpen } from "@/hooks/useOpen";
-import { TweetInfo, UserWithTweetInfo } from "@/types/types";
+import { UserWithTweetInfo } from "@/types/types";
 
-import { Loading } from "../Loading";
-import ModalContainer from "../common/modal/ModalContainer";
-import { TweetTopicsForm } from "./TweetTopicsForm";
-import { RQ_KEY_TWEETINFO } from "@/constants/constants";
-import { getOneUser } from "@/services/api/userApi";
+import ModalContainer from "@/components/common/modal/ModalContainer";
+import { TweetQuestionsForm } from "./TweetQuestionsForm";
 
-type TweetTopicsListProps = {
-  userId: number | undefined;
+type TweetQuestionsListProps = {
+  tweetInfoData: UserWithTweetInfo | undefined;
 };
 
-export const TweetTopicsList = ({ userId }: TweetTopicsListProps) => {
+export const TweetQuestionsList = ({
+  tweetInfoData,
+}: TweetQuestionsListProps) => {
   const { open, handleClose, handleOpen } = useOpen();
 
-  const { data, isLoading, isError, error } = useQuery<
-    UserWithTweetInfo,
-    Error
-  >([RQ_KEY_TWEETINFO], () => getOneUser(userId || 0));
-
   return (
-    <Loading isLoading={isLoading} isError={isError} error={error}>
+    <>
       <Typography variant="h4" component="h2">
-        Tweet Topics
+        Tweet Questions
       </Typography>
-      {data && data.tweetinfo.tweettopics.length > 0 ? (
+      {tweetInfoData && tweetInfoData.tweetinfo.tweetquestions.length > 0 ? (
         <>
           <List dense>
-            {data.tweetinfo.tweettopics.map((topic: string) => {
+            {tweetInfoData.tweetinfo.tweetquestions.map((topic: string) => {
               return (
                 <ListItem key={topic}>
                   <ListItemText primary={topic} />
@@ -56,15 +49,15 @@ export const TweetTopicsList = ({ userId }: TweetTopicsListProps) => {
       )}
       <Box>
         <Button color="primary" variant="contained" onClick={handleOpen}>
-          Edit Topics
+          Edit Questions
         </Button>
       </Box>
       <ModalContainer handleClose={handleClose} open={open}>
-        <TweetTopicsForm
+        <TweetQuestionsForm
           handleClose={handleClose}
-          tweetInfo={data && data.tweetinfo}
+          tweetInfo={tweetInfoData && tweetInfoData.tweetinfo}
         />
       </ModalContainer>
-    </Loading>
+    </>
   );
 };

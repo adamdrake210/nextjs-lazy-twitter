@@ -96,6 +96,10 @@ const LoginForm = () => {
         />
       )}
 
+      {createMutation.isError && (
+        <Typography color="error">{createMutation.error.message}</Typography>
+      )}
+
       <div className={classes.buttonsContainer}>
         {/* <Button onClick={handleClose} type="button" variant="contained">
           Cancel

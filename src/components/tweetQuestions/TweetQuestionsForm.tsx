@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { Box, Button, IconButton, Theme, Typography } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
@@ -28,27 +28,38 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }));
 
-type TweetTopicsFormProps = {
+type TweetQuestionsFormProps = {
   handleClose: () => void;
   tweetInfo?: TweetInfo;
 };
 
-const getDefaultValues = (tweettopics: TweetInfo["tweettopics"]) => {
-  const obj = tweettopics.reduce((acc, cur) => ({ ...acc, [cur]: cur }), {});
-  return obj;
+const convertArrayToObj = (tweetquestions: TweetInfo["tweetquestions"]) => {
+  const initialValue = {};
+
+  const object = tweetquestions.reduce(
+    (obj, item) => ({
+      ...obj,
+      [`tweetquestion${tweetquestions.indexOf(item)}`]: item,
+    }),
+    initialValue
+  );
+  return object;
 };
 
-export const TweetTopicsForm = ({
+export const TweetQuestionsForm = ({
   handleClose,
   tweetInfo,
-}: TweetTopicsFormProps) => {
+}: TweetQuestionsFormProps) => {
   const classes = useStyles();
   const queryClient = useQueryClient();
-  const [tweetTopics, setTweetTopics] = useState<string[]>([]);
-  const [inputFieldCount, setInputFieldCount] = useState(["0"]);
+  const [tweetQuestions, setTweetQuestions] = useState<string[]>([]);
+  const [inputFieldCount, setInputFieldCount] = useState(["random"]);
 
   const { handleSubmit, control, unregister } = useForm<any>({
-    defaultValues: tweetInfo ? getDefaultValues(tweetInfo.tweettopics) : null,
+    defaultValues:
+      tweetInfo && tweetInfo?.tweetquestions.length > 0
+        ? convertArrayToObj(tweetInfo.tweetquestions)
+        : null,
   });
 
   const mutationOptions = {
@@ -73,21 +84,21 @@ export const TweetTopicsForm = ({
   const onSubmit = (formData: { [key: string]: string }) => {
     editMutation.mutate({
       id: tweetInfo?.id,
-      tweettopics: Object.values(formData).filter((el) => el),
+      tweetquestions: Object.values(formData).filter((el) => el),
     });
   };
 
-  const handleRemoveItem = (topic: string) => {
-    const updatedTopics = tweetTopics.filter((tt) => {
-      return tt !== topic;
+  const handleRemoveItem = (question: string) => {
+    const updatedQuestions = tweetQuestions.filter((tt) => {
+      return tt !== question;
     });
-    setTweetTopics(updatedTopics);
-    unregister(topic);
+    setTweetQuestions(updatedQuestions);
+    unregister(question);
   };
 
   useEffect(() => {
     if (tweetInfo) {
-      setTweetTopics(tweetInfo.tweettopics);
+      setTweetQuestions(tweetInfo.tweetquestions);
     }
   }, []);
 
@@ -97,10 +108,10 @@ export const TweetTopicsForm = ({
         Tweet Topics
       </Typography>
 
-      {tweetTopics.map((topic, index) => {
+      {tweetQuestions.map((question, index) => {
         return (
           <Box
-            key={`${topic + index}`}
+            key={`${index}`}
             sx={{
               width: "100%",
               display: "flex",
@@ -110,16 +121,19 @@ export const TweetTopicsForm = ({
           >
             <ControlledTextField
               control={control}
-              name={topic}
-              label={`Topic #${index + 1}`}
+              name={`tweetquestion${tweetQuestions.indexOf(question)}`}
+              label={`Question #${index + 1}`}
               rules={{
                 maxLength: {
-                  value: 24,
-                  message: "String can be maximum 24 characters",
+                  value: 120,
+                  message: "String can be maximum 120 characters",
                 },
               }}
             />
-            <IconButton color="error" onClick={() => handleRemoveItem(topic)}>
+            <IconButton
+              color="error"
+              onClick={() => handleRemoveItem(question)}
+            >
               <RemoveCircleOutlineOutlinedIcon />
             </IconButton>
           </Box>
@@ -139,18 +153,18 @@ export const TweetTopicsForm = ({
           >
             <ControlledTextField
               control={control}
-              name={`tweettopic${index}`}
-              label="Add Topic"
+              name={`newtweetquestion${index}`}
+              label="Add Question"
               rules={{
                 maxLength: {
-                  value: 24,
-                  message: "String can be maximum 24 characters",
+                  value: 120,
+                  message: "String can be maximum 120 characters",
                 },
               }}
             />
             <IconButton
               color="primary"
-              onClick={() => setInputFieldCount([...inputFieldCount, "some"])}
+              onClick={() => setInputFieldCount([...inputFieldCount, "random"])}
             >
               <AddCircleOutlineIcon />
             </IconButton>
@@ -161,7 +175,7 @@ export const TweetTopicsForm = ({
       {editMutation.isLoading && (
         <Loading
           isLoading={editMutation.isLoading}
-          loadingMessage="Updating Topics..."
+          loadingMessage="Updating Questions..."
           isError={editMutation.isError}
           error={editMutation.error}
         />
@@ -183,7 +197,7 @@ export const TweetTopicsForm = ({
           color="primary"
           disabled={editMutation.isLoading}
         >
-          Save Tweet Topics
+          Save
         </Button>
       </div>
     </form>

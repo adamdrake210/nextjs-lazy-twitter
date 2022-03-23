@@ -4,13 +4,13 @@ import { useRouter } from "next/router";
 import { useQuery } from "react-query";
 
 import { Layout } from "@/layout/Layout";
-import { UserProfileDetails } from "@/components/profile/UserProfileDetails";
-import { TweetTopicsList } from "@/components/tweetInfo/TweetTopicsList";
-import { ACCESS_TOKEN } from "@/constants/constants";
+import { TweetTopicsList } from "@/components/tweetTopics/TweetTopicsList";
+import { ACCESS_TOKEN, RQ_KEY_TWEETINFO } from "@/constants/constants";
 import { LOGIN } from "@/constants/routerConstants";
-import { User } from "@/types/types";
+import { User, UserWithTweetInfo } from "@/types/types";
 import { Loading } from "@/components/Loading";
-import { getUserProfile } from "@/services/api/userApi";
+import { getOneUser, getUserProfile } from "@/services/api/userApi";
+import { TweetQuestionsList } from "@/components/tweetQuestions/TweetQuestionsList";
 
 export default function UserDashboard() {
   const router = useRouter();
@@ -29,18 +29,38 @@ export default function UserDashboard() {
     error,
   } = useQuery<User, Error>(["profile"], () => getUserProfile());
 
+  const userId = userData?.id;
+
+  const {
+    data: tweetInfoData,
+    isIdle,
+    isLoading: tweetInfoIsLoading,
+    isError: tweetInfoIsError,
+    error: tweetInfoError,
+  } = useQuery<UserWithTweetInfo, Error>(
+    [RQ_KEY_TWEETINFO],
+    () => getOneUser(userId || 0),
+    {
+      enabled: !!userId,
+    }
+  );
+
   return (
     <Layout title="Home">
       <Typography component="h1" variant="h3" gutterBottom>
         Your Dashboard
       </Typography>
-      <Loading isLoading={isLoading} isError={isError} error={error}>
+      <Loading
+        isLoading={isLoading || tweetInfoIsLoading || isIdle}
+        isError={isError || tweetInfoIsError}
+        error={error || tweetInfoError}
+      >
         <Grid container spacing={2}>
           <Grid item xs={12} sm={8}>
-            <UserProfileDetails userData={userData || null} />
+            <TweetQuestionsList tweetInfoData={tweetInfoData} />
           </Grid>
           <Grid item xs={12} sm={4}>
-            <TweetTopicsList userId={userData?.id} />
+            <TweetTopicsList tweetInfoData={tweetInfoData} />
           </Grid>
         </Grid>
       </Loading>

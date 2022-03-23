@@ -10,7 +10,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     maxWidth: 700,
-    minWidth: 550,
     width: "100%",
     margin: "0 auto",
   },
