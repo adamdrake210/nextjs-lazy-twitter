@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { Box, Button, IconButton, Theme, Typography } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
@@ -11,6 +11,8 @@ import { TweetInfo } from "@/types/types";
 import { updateTweetInfo } from "@/services/api/tweetInfoApi";
 import { Loading } from "../Loading";
 import ControlledTextField from "@/components/common/fields/ControlledTextField";
+import ShowError from "../common/ShowError";
+import { convertArrayToObj } from "@/utils/convertArrayToObj";
 
 const useStyles = makeStyles<Theme>((theme) => ({
   formContainer: {
@@ -33,11 +35,6 @@ type TweetTopicsFormProps = {
   tweetInfo?: TweetInfo;
 };
 
-const getDefaultValues = (tweettopics: TweetInfo["tweettopics"]) => {
-  const obj = tweettopics.reduce((acc, cur) => ({ ...acc, [cur]: cur }), {});
-  return obj;
-};
-
 export const TweetTopicsForm = ({
   handleClose,
   tweetInfo,
@@ -48,7 +45,10 @@ export const TweetTopicsForm = ({
   const [inputFieldCount, setInputFieldCount] = useState(["random"]);
 
   const { handleSubmit, control, unregister } = useForm<any>({
-    defaultValues: tweetInfo ? getDefaultValues(tweetInfo.tweettopics) : null,
+    defaultValues:
+      tweetInfo && tweetInfo?.tweettopics.length > 0
+        ? convertArrayToObj(tweetInfo.tweettopics, "tweettopic")
+        : null,
   });
 
   const mutationOptions = {
@@ -82,7 +82,7 @@ export const TweetTopicsForm = ({
       return tt !== topic;
     });
     setTweetTopics(updatedTopics);
-    unregister(topic);
+    unregister(`tweettopic${tweetTopics.indexOf(topic)}`);
   };
 
   useEffect(() => {
@@ -110,7 +110,7 @@ export const TweetTopicsForm = ({
           >
             <ControlledTextField
               control={control}
-              name={topic}
+              name={`tweettopic${tweetTopics.indexOf(topic)}`}
               label={`Topic #${index + 1}`}
               rules={{
                 maxLength: {
@@ -139,7 +139,7 @@ export const TweetTopicsForm = ({
           >
             <ControlledTextField
               control={control}
-              name={`tweettopic${index}`}
+              name={`newtweettopic${index}`}
               label="Add Topic"
               rules={{
                 maxLength: {
@@ -165,6 +165,10 @@ export const TweetTopicsForm = ({
           isError={editMutation.isError}
           error={editMutation.error}
         />
+      )}
+
+      {editMutation.isError && (
+        <ShowError message={editMutation.error.message} />
       )}
 
       <div className={classes.buttonsContainer}>

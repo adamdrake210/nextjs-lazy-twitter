@@ -11,6 +11,8 @@ import { TweetInfo } from "@/types/types";
 import { updateTweetInfo } from "@/services/api/tweetInfoApi";
 import { Loading } from "../Loading";
 import ControlledTextField from "@/components/common/fields/ControlledTextField";
+import ShowError from "../common/ShowError";
+import { convertArrayToObj } from "@/utils/convertArrayToObj";
 
 const useStyles = makeStyles<Theme>((theme) => ({
   formContainer: {
@@ -33,19 +35,6 @@ type TweetQuestionsFormProps = {
   tweetInfo?: TweetInfo;
 };
 
-const convertArrayToObj = (tweetquestions: TweetInfo["tweetquestions"]) => {
-  const initialValue = {};
-
-  const object = tweetquestions.reduce(
-    (obj, item) => ({
-      ...obj,
-      [`tweetquestion${tweetquestions.indexOf(item)}`]: item,
-    }),
-    initialValue
-  );
-  return object;
-};
-
 export const TweetQuestionsForm = ({
   handleClose,
   tweetInfo,
@@ -58,7 +47,7 @@ export const TweetQuestionsForm = ({
   const { handleSubmit, control, unregister } = useForm<any>({
     defaultValues:
       tweetInfo && tweetInfo?.tweetquestions.length > 0
-        ? convertArrayToObj(tweetInfo.tweetquestions)
+        ? convertArrayToObj(tweetInfo.tweetquestions, "tweetquestion")
         : null,
   });
 
@@ -93,7 +82,7 @@ export const TweetQuestionsForm = ({
       return tt !== question;
     });
     setTweetQuestions(updatedQuestions);
-    unregister(question);
+    unregister(`tweetquestion${tweetQuestions.indexOf(question)}`);
   };
 
   useEffect(() => {
@@ -179,6 +168,10 @@ export const TweetQuestionsForm = ({
           isError={editMutation.isError}
           error={editMutation.error}
         />
+      )}
+
+      {editMutation.isError && (
+        <ShowError message={editMutation.error.message} />
       )}
 
       <div className={classes.buttonsContainer}>

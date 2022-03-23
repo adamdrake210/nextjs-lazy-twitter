@@ -10,6 +10,7 @@ import ControlledPasswordField from "@/components/common/fields/ControlledPasswo
 import { Loading } from "../Loading";
 import { HOME } from "@/constants/routerConstants";
 import { ACCESS_TOKEN } from "@/constants/constants";
+import ShowError from "../common/ShowError";
 
 const useStyles = makeStyles<Theme>((theme) => ({
   formContainer: {
@@ -97,7 +98,7 @@ const LoginForm = () => {
       )}
 
       {createMutation.isError && (
-        <Typography color="error">{createMutation.error.message}</Typography>
+        <ShowError message={createMutation.error.message} />
       )}
 
       <div className={classes.buttonsContainer}>
