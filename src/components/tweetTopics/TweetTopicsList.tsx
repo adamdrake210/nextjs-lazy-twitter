@@ -39,7 +39,7 @@ export const TweetTopicsList = ({ tweetInfoData }: TweetTopicsListProps) => {
           </List>
         </>
       ) : (
-        <Box sx={{ mt: 2 }}>
+        <Box sx={{ my: 2 }}>
           <Typography component="p">
             You currently don&apos;t have any Tweet Topics
           </Typography>
