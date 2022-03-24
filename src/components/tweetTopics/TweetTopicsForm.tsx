@@ -6,13 +6,12 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
 
 import { RQ_KEY_TWEETINFO } from "@/constants/constants";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { TweetInfo } from "@/types/types";
 import { updateTweetInfo } from "@/services/api/tweetInfoApi";
 import { Loading } from "../Loading";
 import ControlledTextField from "@/components/common/fields/ControlledTextField";
 import ShowError from "../common/ShowError";
-import { convertArrayToObj } from "@/utils/convertArrayToObj";
 
 const useStyles = makeStyles<Theme>((theme) => ({
   formContainer: {
@@ -41,14 +40,12 @@ export const TweetTopicsForm = ({
 }: TweetTopicsFormProps) => {
   const classes = useStyles();
   const queryClient = useQueryClient();
-  const [tweetTopics, setTweetTopics] = useState<string[]>([]);
-  const [inputFieldCount, setInputFieldCount] = useState(["random"]);
 
-  const { handleSubmit, control, unregister } = useForm<any>({
-    defaultValues:
-      tweetInfo && tweetInfo?.tweettopics.length > 0
-        ? convertArrayToObj(tweetInfo.tweettopics, "tweettopic")
-        : null,
+  const { handleSubmit, control } = useForm<any>();
+
+  const { fields, append, remove } = useFieldArray({
+    name: "topics",
+    control,
   });
 
   const mutationOptions = {
@@ -70,24 +67,22 @@ export const TweetTopicsForm = ({
     mutationOptions
   );
 
-  const onSubmit = (formData: { [key: string]: string }) => {
+  const onSubmit = (formData: { topics: Array<{ topic: string }> }) => {
+    const updatedTweetTopics = formData.topics.map((topic) => {
+      return topic.topic;
+    });
+
     editMutation.mutate({
       id: tweetInfo?.id,
-      tweettopics: Object.values(formData).filter((el) => el),
+      tweettopics: updatedTweetTopics,
     });
-  };
-
-  const handleRemoveItem = (topic: string) => {
-    const updatedTopics = tweetTopics.filter((tt) => {
-      return tt !== topic;
-    });
-    setTweetTopics(updatedTopics);
-    unregister(`tweettopic${tweetTopics.indexOf(topic)}`);
   };
 
   useEffect(() => {
     if (tweetInfo) {
-      setTweetTopics(tweetInfo.tweettopics);
+      tweetInfo.tweettopics.forEach((topic) => {
+        append({ topic: topic });
+      });
     }
   }, []);
 
@@ -97,10 +92,10 @@ export const TweetTopicsForm = ({
         Tweet Topics
       </Typography>
 
-      {tweetTopics.map((topic, index) => {
+      {fields.map((field, index) => {
         return (
           <Box
-            key={`${topic + index}`}
+            key={field.id}
             sx={{
               width: "100%",
               display: "flex",
@@ -110,7 +105,7 @@ export const TweetTopicsForm = ({
           >
             <ControlledTextField
               control={control}
-              name={`tweettopic${tweetTopics.indexOf(topic)}`}
+              name={`topics.${index}.topic`}
               label={`Topic #${index + 1}`}
               rules={{
                 maxLength: {
@@ -119,44 +114,16 @@ export const TweetTopicsForm = ({
                 },
               }}
             />
-            <IconButton color="error" onClick={() => handleRemoveItem(topic)}>
+
+            <IconButton color="error" onClick={() => remove(index)}>
               <RemoveCircleOutlineOutlinedIcon />
             </IconButton>
           </Box>
         );
       })}
-
-      {inputFieldCount.map((count, index) => {
-        return (
-          <Box
-            key={`topic${index}`}
-            sx={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <ControlledTextField
-              control={control}
-              name={`newtweettopic${index}`}
-              label="Add Topic"
-              rules={{
-                maxLength: {
-                  value: 24,
-                  message: "String can be maximum 24 characters",
-                },
-              }}
-            />
-            <IconButton
-              color="primary"
-              onClick={() => setInputFieldCount([...inputFieldCount, "random"])}
-            >
-              <AddCircleOutlineIcon />
-            </IconButton>
-          </Box>
-        );
-      })}
+      <IconButton color="primary" onClick={() => append({ topic: "" })}>
+        <AddCircleOutlineIcon />
+      </IconButton>
 
       {editMutation.isLoading && (
         <Loading

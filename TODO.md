@@ -2,3 +2,4 @@
 - auth so when token invalid its removed and login page redirect
 - profile page
 - bug when removing first item of form
+- Rendering modal on mobile - needs to be thinner
