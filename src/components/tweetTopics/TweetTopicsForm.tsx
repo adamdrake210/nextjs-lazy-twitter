@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useMutation, useQueryClient } from "react-query";
+import { useFieldArray, useForm } from "react-hook-form";
 import {
   Box,
   Button,
@@ -13,7 +14,6 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
 
 import { RQ_KEY_TWEETINFO } from "@/constants/constants";
-import { useFieldArray, useForm } from "react-hook-form";
 import { TweetInfo } from "@/types/types";
 import { updateTweetInfo } from "@/services/api/tweetInfoApi";
 import { Loading } from "../Loading";
@@ -124,7 +124,7 @@ export const TweetTopicsForm = ({
               }}
             />
 
-            <Tooltip title="Remove a topic">
+            <Tooltip title="Remove this topic">
               <IconButton color="error" onClick={() => remove(index)}>
                 <RemoveCircleOutlineOutlinedIcon />
               </IconButton>
@@ -167,7 +167,7 @@ export const TweetTopicsForm = ({
           color="primary"
           disabled={editMutation.isLoading}
         >
-          Save Tweet Topics
+          Save
         </Button>
       </div>
     </form>

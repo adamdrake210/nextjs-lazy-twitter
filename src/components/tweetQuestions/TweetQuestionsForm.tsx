@@ -1,12 +1,19 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
-import { Box, Button, IconButton, Theme, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  Theme,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
 
 import { RQ_KEY_TWEETINFO } from "@/constants/constants";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { TweetInfo } from "@/types/types";
 import { updateTweetInfo } from "@/services/api/tweetInfoApi";
 import { Loading } from "../Loading";
@@ -35,20 +42,20 @@ type TweetQuestionsFormProps = {
   tweetInfo?: TweetInfo;
 };
 
+type FormDataValues = { questions: Array<{ question: string }> };
+
 export const TweetQuestionsForm = ({
   handleClose,
   tweetInfo,
 }: TweetQuestionsFormProps) => {
   const classes = useStyles();
   const queryClient = useQueryClient();
-  const [tweetQuestions, setTweetQuestions] = useState<string[]>([]);
-  const [inputFieldCount, setInputFieldCount] = useState(["random"]);
 
-  const { handleSubmit, control, unregister } = useForm<any>({
-    defaultValues:
-      tweetInfo && tweetInfo?.tweetquestions.length > 0
-        ? convertArrayToObj(tweetInfo.tweetquestions, "tweetquestion")
-        : null,
+  const { handleSubmit, control } = useForm<FormDataValues>();
+
+  const { fields, append, remove } = useFieldArray({
+    name: "questions",
+    control,
   });
 
   const mutationOptions = {
@@ -70,37 +77,35 @@ export const TweetQuestionsForm = ({
     mutationOptions
   );
 
-  const onSubmit = (formData: { [key: string]: string }) => {
+  const onSubmit = (formData: FormDataValues) => {
+    const updatedTweetQuestions = formData.questions.map((question) => {
+      return question.question;
+    });
+
     editMutation.mutate({
       id: tweetInfo?.id,
-      tweetquestions: Object.values(formData).filter((el) => el),
+      tweetquestions: updatedTweetQuestions.filter((el) => el),
     });
-  };
-
-  const handleRemoveItem = (question: string) => {
-    const updatedQuestions = tweetQuestions.filter((tt) => {
-      return tt !== question;
-    });
-    setTweetQuestions(updatedQuestions);
-    unregister(`tweetquestion${tweetQuestions.indexOf(question)}`);
   };
 
   useEffect(() => {
     if (tweetInfo) {
-      setTweetQuestions(tweetInfo.tweetquestions);
+      tweetInfo.tweetquestions.forEach((question) => {
+        append({ question: question });
+      });
     }
   }, []);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={classes.formContainer}>
       <Typography variant="h4" gutterBottom>
-        Tweet Topics
+        Tweet Questions
       </Typography>
 
-      {tweetQuestions.map((question, index) => {
+      {fields.map((field, index) => {
         return (
           <Box
-            key={`${index}`}
+            key={field.id}
             sx={{
               width: "100%",
               display: "flex",
@@ -110,7 +115,7 @@ export const TweetQuestionsForm = ({
           >
             <ControlledTextField
               control={control}
-              name={`tweetquestion${tweetQuestions.indexOf(question)}`}
+              name={`questions.${index}.question`}
               label={`Question #${index + 1}`}
               rules={{
                 maxLength: {
@@ -119,47 +124,20 @@ export const TweetQuestionsForm = ({
                 },
               }}
             />
-            <IconButton
-              color="error"
-              onClick={() => handleRemoveItem(question)}
-            >
-              <RemoveCircleOutlineOutlinedIcon />
-            </IconButton>
-          </Box>
-        );
-      })}
 
-      {inputFieldCount.map((count, index) => {
-        return (
-          <Box
-            key={`topic${index}`}
-            sx={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <ControlledTextField
-              control={control}
-              name={`newtweetquestion${index}`}
-              label="Add Question"
-              rules={{
-                maxLength: {
-                  value: 120,
-                  message: "String can be maximum 120 characters",
-                },
-              }}
-            />
-            <IconButton
-              color="primary"
-              onClick={() => setInputFieldCount([...inputFieldCount, "random"])}
-            >
-              <AddCircleOutlineIcon />
-            </IconButton>
+            <Tooltip title="Remove this question">
+              <IconButton color="error" onClick={() => remove(index)}>
+                <RemoveCircleOutlineOutlinedIcon />
+              </IconButton>
+            </Tooltip>
           </Box>
         );
       })}
+      <Tooltip title="Add a question">
+        <IconButton color="primary" onClick={() => append({ question: "" })}>
+          <AddCircleOutlineIcon />
+        </IconButton>
+      </Tooltip>
 
       {editMutation.isLoading && (
         <Loading
