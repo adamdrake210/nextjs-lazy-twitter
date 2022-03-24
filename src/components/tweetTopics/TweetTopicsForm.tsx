@@ -1,6 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useMutation, useQueryClient } from "react-query";
-import { Box, Button, IconButton, Theme, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  Theme,
+  Typography,
+  Tooltip,
+} from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
@@ -34,6 +41,8 @@ type TweetTopicsFormProps = {
   tweetInfo?: TweetInfo;
 };
 
+type FormDataValues = { topics: Array<{ topic: string }> };
+
 export const TweetTopicsForm = ({
   handleClose,
   tweetInfo,
@@ -41,7 +50,7 @@ export const TweetTopicsForm = ({
   const classes = useStyles();
   const queryClient = useQueryClient();
 
-  const { handleSubmit, control } = useForm<any>();
+  const { handleSubmit, control } = useForm<FormDataValues>();
 
   const { fields, append, remove } = useFieldArray({
     name: "topics",
@@ -67,14 +76,14 @@ export const TweetTopicsForm = ({
     mutationOptions
   );
 
-  const onSubmit = (formData: { topics: Array<{ topic: string }> }) => {
+  const onSubmit = (formData: FormDataValues) => {
     const updatedTweetTopics = formData.topics.map((topic) => {
       return topic.topic;
     });
 
     editMutation.mutate({
       id: tweetInfo?.id,
-      tweettopics: updatedTweetTopics,
+      tweettopics: updatedTweetTopics.filter((el) => el),
     });
   };
 
@@ -115,15 +124,19 @@ export const TweetTopicsForm = ({
               }}
             />
 
-            <IconButton color="error" onClick={() => remove(index)}>
-              <RemoveCircleOutlineOutlinedIcon />
-            </IconButton>
+            <Tooltip title="Remove a topic">
+              <IconButton color="error" onClick={() => remove(index)}>
+                <RemoveCircleOutlineOutlinedIcon />
+              </IconButton>
+            </Tooltip>
           </Box>
         );
       })}
-      <IconButton color="primary" onClick={() => append({ topic: "" })}>
-        <AddCircleOutlineIcon />
-      </IconButton>
+      <Tooltip title="Add a topic">
+        <IconButton color="primary" onClick={() => append({ topic: "" })}>
+          <AddCircleOutlineIcon />
+        </IconButton>
+      </Tooltip>
 
       {editMutation.isLoading && (
         <Loading
