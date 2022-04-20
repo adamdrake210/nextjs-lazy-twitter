@@ -11,10 +11,20 @@ import { getOneUser, getUserProfile } from "@/services/api/userApi";
 import { TweetQuestionsList } from "@/components/tweetQuestions/TweetQuestionsList";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "@/utils/cookies";
+import isEmpty from "lodash.isempty";
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const data = parseCookies(req);
 
+  if (isEmpty(data)) {
+    res.statusCode = 403;
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
   return {
     props: {
       data,

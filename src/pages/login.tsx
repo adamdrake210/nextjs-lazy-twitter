@@ -1,13 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Box, Typography } from "@mui/material";
 
-import { HOME } from "@/constants/routerConstants";
-
-import { ACCESS_TOKEN, COMPANY_NAME } from "@/constants/constants";
+import { COMPANY_NAME } from "@/constants/constants";
 import { green } from "@mui/material/colors";
 import { Layout } from "@/layout/Layout";
 import LoginForm from "@/components/login/LoginForm";
-import { useRouter } from "next/router";
 
 export default function Login() {
   return (
