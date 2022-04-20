@@ -9,9 +9,10 @@ import Navigation from "@/components/navigation/Navigation";
 type LayoutProps = {
   children: ReactNode;
   title: string;
+  cookies?: any;
 };
 
-export const Layout = ({ children, title }: LayoutProps) => {
+export const Layout = ({ children, title, cookies }: LayoutProps) => {
   return (
     <div>
       <Head>
@@ -19,7 +20,7 @@ export const Layout = ({ children, title }: LayoutProps) => {
           {title} | {COMPANY_NAME}
         </title>
       </Head>
-      <Navigation />
+      <Navigation cookies={cookies} />
       <Box
         component="main"
         maxWidth="lg"

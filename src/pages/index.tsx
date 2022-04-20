@@ -1,27 +1,38 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Grid, Typography } from "@mui/material";
-import { useRouter } from "next/router";
 import { useQuery } from "react-query";
 
 import { Layout } from "@/layout/Layout";
 import { TweetTopicsList } from "@/components/tweetTopics/TweetTopicsList";
-import { ACCESS_TOKEN, RQ_KEY_TWEETINFO } from "@/constants/constants";
-import { LOGIN } from "@/constants/routerConstants";
+import { RQ_KEY_TWEETINFO } from "@/constants/constants";
 import { User, UserWithTweetInfo } from "@/types/types";
 import { Loading } from "@/components/Loading";
 import { getOneUser, getUserProfile } from "@/services/api/userApi";
 import { TweetQuestionsList } from "@/components/tweetQuestions/TweetQuestionsList";
+import { GetServerSideProps } from "next";
+import { parseCookies } from "@/utils/cookies";
+import isEmpty from "lodash.isempty";
 
-export default function UserDashboard() {
-  const router = useRouter();
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const data = parseCookies(req);
 
-  useEffect(() => {
-    if (!localStorage[ACCESS_TOKEN]) {
-      router.push(LOGIN);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  if (isEmpty(data)) {
+    res.statusCode = 403;
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+  return {
+    props: {
+      data,
+    },
+  };
+};
 
+export default function UserDashboard({ data }: { data: any }) {
   const {
     data: userData,
     isLoading,
@@ -46,7 +57,7 @@ export default function UserDashboard() {
   );
 
   return (
-    <Layout title="Home">
+    <Layout title="Home" cookies={data}>
       <Typography component="h1" variant="h3" gutterBottom>
         Your Dashboard
       </Typography>

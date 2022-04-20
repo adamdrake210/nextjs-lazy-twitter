@@ -20,8 +20,8 @@ import {
   USER_PROFILE,
   LOGIN,
 } from "@/constants/routerConstants";
-import { ACCESS_TOKEN, COMPANY_NAME } from "@/constants/constants";
-import { Loading } from "../Loading";
+import { COMPANY_NAME } from "@/constants/constants";
+import { logout } from "@/services/api/authApi";
 
 const menuItems = [
   {
@@ -39,15 +39,19 @@ const avatorDropDownMenu = [
   },
 ];
 
-const Navigation: React.FC = () => {
+type NavigationProps = {
+  cookies?: any;
+};
+
+const Navigation = ({ cookies }: NavigationProps) => {
   const router = useRouter();
+
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
-  const [accessToken, setAccesstoken] = React.useState<string | undefined>("");
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -64,17 +68,10 @@ const Navigation: React.FC = () => {
     setAnchorElUser(null);
   };
 
-  const handleSignOut = () => {
-    setAccesstoken("");
-    localStorage.removeItem(ACCESS_TOKEN);
+  const handleSignOut = async () => {
+    await logout();
     router.push(LOGIN);
   };
-
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      setAccesstoken(localStorage[ACCESS_TOKEN]);
-    }
-  }, []);
 
   return (
     <AppBar position="static">
@@ -96,7 +93,7 @@ const Navigation: React.FC = () => {
               {COMPANY_NAME}
             </Typography>
           </Link>
-          {accessToken && (
+          {cookies?.Refresh && (
             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
               <IconButton
                 size="large"
@@ -153,7 +150,7 @@ const Navigation: React.FC = () => {
               cursor: "pointer",
             }}
           >
-            {accessToken && (
+            {cookies?.Refresh && (
               <>
                 {menuItems.map((item) => (
                   <Link href={item.url} passHref key={item.label}>
@@ -171,7 +168,7 @@ const Navigation: React.FC = () => {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            {accessToken ? (
+            {cookies?.Refresh ? (
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar src="https://pbs.twimg.com/profile_images/846643773107048448/l3zndenR_normal.jpg" />

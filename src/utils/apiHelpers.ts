@@ -15,6 +15,7 @@ export const axiosCall = async (requestBody: any) => {
   const response = await getDataFromApi(
     axios({
       baseURL: process.env.NEXT_PUBLIC_API_ENDPOINT,
+      withCredentials: true,
       ...requestBody,
     })
   );
