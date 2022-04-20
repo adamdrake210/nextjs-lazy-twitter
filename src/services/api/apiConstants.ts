@@ -1,14 +1,21 @@
 export const API_ENDPOINTS = {
-  // USER API ENDPOINTS
+  // AUTH API ENDPOINTS
 
-  API_USER_LOGIN: {
+  API_AUTH_LOGOUT: {
+    method: "post",
+    url: "auth/logout",
+  },
+  API_AUTH_LOGIN: {
     method: "post",
     url: "auth/login",
   },
-  API_USER_REGISTER: {
+  API_AUTH_REGISTER: {
     method: "post",
     url: "register",
   },
+
+  // USER API ENDPOINTS
+
   API_USER_PROFILE: {
     method: "get",
     url: "profile",

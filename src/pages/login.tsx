@@ -10,16 +10,6 @@ import LoginForm from "@/components/login/LoginForm";
 import { useRouter } from "next/router";
 
 export default function Login() {
-  const router = useRouter();
-
-  useEffect(() => {
-    if (localStorage[ACCESS_TOKEN]) {
-      router.push(HOME);
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <Layout title="Login">
       <Box

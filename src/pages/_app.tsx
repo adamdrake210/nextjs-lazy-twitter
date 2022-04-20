@@ -56,6 +56,7 @@ const App = ({
           <Component {...pageProps} />
         </ThemeProvider>
       </CacheProvider>
+
       <ReactQueryDevtools />
     </QueryClientProvider>
   );
